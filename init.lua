@@ -69,6 +69,7 @@ Kickstart Guide:
   I have left several `:help X` comments throughout the init.lua
     These are hints about where to find more information about the relevant settings,
     plugins or Neovim features used in Kickstart.
+   
 
    NOTE: Look for lines like this
 
