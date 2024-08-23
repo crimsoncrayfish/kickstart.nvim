@@ -484,7 +484,7 @@ require('lazy').setup({
           -- Jump to the definition of the word under your cursor.
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
-          map('<leader>pp', '<CMD>lua MyMenu()<CR>', 'Open my project list')
+          -- TODO: map('<leader>pp', '<CMD>lua MyMenu()<CR>', 'Open my project list')
           map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
 
           -- Find references for the word under your cursor.
@@ -952,6 +952,6 @@ require('lazy').setup({
     },
   },
 })
-require 'projects'
+-- TODO: fix this  -> require 'projects'
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
