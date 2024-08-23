@@ -578,17 +578,12 @@ require('lazy').setup({
         gopls = {},
         csharp_ls = {},
         tsserver = {},
-        -- pyright = {},
         rust_analyzer = {},
         zls = {},
         angularls = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
-        -- Some languages (like typescript) have entire language plugins that can be useful:
-        --    https://github.com/pmizio/typescript-tools.nvim
-        --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        -- tsserver = {},
         --
 
         lua_ls = {
@@ -630,6 +625,7 @@ require('lazy').setup({
         'zls',
         'codelldb',
         'angular-language-server',
+        --'htmx-lsp',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
