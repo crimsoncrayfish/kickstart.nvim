@@ -39,6 +39,14 @@ local config = {
         key_format = ' %s', -- remove default surrounding `[]`
         action = 'lua vim.cmd.Neotree()',
       },
+      {
+        icon = ' ',
+        desc = "Help, i'm stuck",
+        keymap = ':q',
+        key = 'q',
+        key_format = ' %s', -- remove default surrounding `[]`
+        action = 'q',
+      },
     },
     footer = {}, --your footer
   },
