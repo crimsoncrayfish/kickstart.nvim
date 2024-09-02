@@ -1,7 +1,3 @@
-require 'custom.plugins.dashboard_list'
-math.randomseed(os.time())
-
-local dash_count = #Dashboards
 local dash = {
   [[]],
   [[]],
@@ -26,11 +22,33 @@ local dash = {
   [[]],
   [[]],
 }
-
-if dash_count > 1 then
-  local random_index = math.random(1, dash_count)
-  dash = Dashboards[random_index]
+function isModuleAvailable(name)
+  if package.loaded[name] then
+    return true
+  else
+    for _, searcher in ipairs(package.searchers or package.loaders) do
+      local loader = searcher(name)
+      if type(loader) == 'function' then
+        package.preload[name] = loader
+        return true
+      end
+    end
+    return false
+  end
 end
+
+if isModuleAvailable 'custom.plugins.dashboard_list' then
+  require 'custom.plugins.dashboard_list'
+  math.randomseed(os.time())
+
+  local dash_count = #Dashboards
+
+  if dash_count > 1 then
+    local random_index = math.random(1, dash_count)
+    dash = Dashboards[random_index]
+  end
+end
+
 local config = {
   theme = 'doom',
   config = {
