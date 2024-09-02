@@ -48,7 +48,7 @@ local config = {
         action = "lua require('telescope.builtin').find_files()",
       },
       {
-        icon = ' ',
+        icon = '🔍',
         desc = 'Grep',
         keymap = 'SPC f g',
         key = 'g',
@@ -56,7 +56,7 @@ local config = {
         action = "lua require('telescope.builtin').live_grep()",
       },
       {
-        icon = ' ',
+        icon = '📁',
         desc = 'File Explorer',
         keymap = 'SPC p v',
         key = 'e',
@@ -70,6 +70,14 @@ local config = {
         key = 'q',
         key_format = ' %s', -- remove default surrounding `[]`
         action = 'q',
+      },
+      {
+        icon = ' ',
+        desc = 'Terminal',
+        keymap = 'SPV t t',
+        key = 't',
+        key_format = ' %s', -- remove default surrounding `[]`
+        action = 'ToggleTerm size=15 direction=horizontal name=dashboard',
       },
     },
     footer = {}, --your footer
