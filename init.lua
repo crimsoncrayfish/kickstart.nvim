@@ -507,7 +507,12 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         --
-
+        templ = {
+          filetypes = { 'templ' },
+        },
+        html = {
+          filetypes = { 'html', 'templ', 'gohtml' },
+        },
         lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
@@ -547,7 +552,11 @@ require('lazy').setup({
         'zls',
         'codelldb',
         'angular-language-server',
-        --'htmx-lsp',
+        'htmx-lsp',
+        'templ',
+        'html-lsp',
+        'tsserver',
+        'angularls',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 

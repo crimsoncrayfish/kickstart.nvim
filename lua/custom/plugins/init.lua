@@ -32,6 +32,7 @@ return {
     config = function()
       require('toggleterm').setup {
         open_mapping = [[<leader>tt]],
+        insert_mapping = false,
         hide_numbers = true,
         start_in_insert = true,
         direction = 'vertical',
