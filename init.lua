@@ -355,7 +355,35 @@ require('lazy').setup({
       --
       -- If you're wondering about lsp vs treesitter, you can check out the wonderfully
       -- and elegantly composed help section, `:help lsp-vs-treesitter`
+      local go_to_definition = function()
+        if vim.bo.filetype == 'go' then
+          vim.lsp.buf.definition {
+            on_list = function(options)
+              if options == nil or options.items == nil or #options.items == 0 then
+                return
+              end
 
+              local targetFile = options.items[1].filename
+              local prefix = string.match(targetFile, '(.-)_templ%.go$')
+
+              if prefix then
+                local function_name = vim.fn.expand '<cword>'
+                options.items[1].filename = prefix .. '.templ'
+
+                vim.fn.setqflist({}, ' ', options)
+                vim.api.nvim_command 'cfirst'
+
+                vim.api.nvim_command('silent! /templ ' .. function_name)
+              else
+                vim.lsp.buf.definition()
+              end
+            end,
+          }
+        else
+          vim.lsp.buf.definition()
+        end
+      end
+      vim.keymap.set('n', 'gd', go_to_definition)
       --  This function gets run when an LSP attaches to a particular buffer.
       --    That is to say, every time a new file is opened that is associated with
       --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
