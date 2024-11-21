@@ -4,4 +4,5 @@ test.sh
 nvim
 
 spell/
+dashboard_list.lua
 lazy-lock.json

@@ -1,7 +1,3 @@
--- You can add your own plugins here or in other files in this directory!
---  I promise not to create any merge conflicts in this directory :)
---
--- See the kickstart.nvim README for more information
 return {
   { 'catppuccin/nvim', name = 'catppuccin', priority = 1000 },
   {
@@ -29,5 +25,26 @@ return {
         },
       },
     },
+  },
+  {
+    'akinsho/toggleterm.nvim',
+    version = '*',
+    config = function()
+      require('toggleterm').setup {
+        open_mapping = [[<leader>tt]],
+        insert_mapping = false,
+        hide_numbers = true,
+        start_in_insert = true,
+        direction = 'vertical',
+        auto_scroll = true,
+        size = function(term)
+          if term.direction == 'horizontal' then
+            return 15
+          elseif term.direction == 'vertical' then
+            return vim.o.columns * 0.4
+          end
+        end,
+      }
+    end,
   },
 }

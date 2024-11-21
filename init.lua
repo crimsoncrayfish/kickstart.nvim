@@ -85,6 +85,8 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+vim.keymap.set('n', '<leader>]', vim.diagnostic.goto_next, { desc = 'Jump to next err' })
+vim.keymap.set('n', '<leader>[', vim.diagnostic.goto_prev, { desc = 'Jump to previous err' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -95,10 +97,10 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 -- TIP: Disable arrow keys in normal mode
--- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
--- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
--- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
--- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
+vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
+vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
+vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
@@ -108,7 +110,8 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-vim.keymap.set('n', '<leader>pv', vim.cmd.Neotree, { desc = 'Move focus to the upper window' })
+vim.keymap.set('n', '<leader>ft', vim.cmd.Neotree, { desc = 'Open file explorer' })
+vim.keymap.set('n', '<leader>fr', ':Neotree reveal<CR>', { desc = 'Reveal current file in neotree' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -310,6 +313,22 @@ require('lazy').setup({
       },
     },
   },
+  {
+    'rust-lang/rust.vim',
+    ft = 'rust',
+    init = function()
+      vim.g.rustfmt_autosave = 1
+    end,
+  },
+  {
+    'saecki/crates.nvim',
+    ft = { 'rust', 'toml' },
+    config = function(_, opts)
+      local crates = require 'crates'
+      crates.setup(opts)
+      crates.show()
+    end,
+  },
   { 'Bilal2453/luvit-meta', lazy = true },
   {
     -- Main LSP Configuration
@@ -352,7 +371,35 @@ require('lazy').setup({
       --
       -- If you're wondering about lsp vs treesitter, you can check out the wonderfully
       -- and elegantly composed help section, `:help lsp-vs-treesitter`
+      local go_to_definition = function()
+        if vim.bo.filetype == 'go' then
+          vim.lsp.buf.definition {
+            on_list = function(options)
+              if options == nil or options.items == nil or #options.items == 0 then
+                return
+              end
 
+              local targetFile = options.items[1].filename
+              local prefix = string.match(targetFile, '(.-)_templ%.go$')
+
+              if prefix then
+                local function_name = vim.fn.expand '<cword>'
+                options.items[1].filename = prefix .. '.templ'
+
+                vim.fn.setqflist({}, ' ', options)
+                vim.api.nvim_command 'cfirst'
+
+                vim.api.nvim_command('silent! /templ ' .. function_name)
+              else
+                vim.lsp.buf.definition()
+              end
+            end,
+          }
+        else
+          vim.lsp.buf.definition()
+        end
+      end
+      vim.keymap.set('n', 'gd', go_to_definition)
       --  This function gets run when an LSP attaches to a particular buffer.
       --    That is to say, every time a new file is opened that is associated with
       --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
@@ -464,19 +511,35 @@ require('lazy').setup({
       --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+      local util = require 'lspconfig.util'
       local servers = {
         -- clangd = {},
         gopls = {},
         -- csharp_ls = {},
         tsserver = {},
-        rust_analyzer = {},
+        rust_analyzer = {
+          filetypes = { 'rust' },
+          root_dir = util.root_pattern 'Cargo.toml',
+          settings = {
+            ['rust-analyzer'] = {
+              cargo = {
+                allFeatures = true,
+              },
+            },
+          },
+        },
         zls = {},
         angularls = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         --
-
+        templ = {
+          filetypes = { 'templ' },
+        },
+        html = {
+          filetypes = { 'html', 'templ', 'gohtml' },
+        },
         lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
@@ -508,7 +571,7 @@ require('lazy').setup({
         'stylua',
         'gopls',
         'goimports-reviser',
-        --'csharp-language-server',
+        'csharp-language-server',
         'prettier',
         'typescript-language-server',
         'tailwindcss-language-server',
@@ -516,7 +579,11 @@ require('lazy').setup({
         'zls',
         'codelldb',
         'angular-language-server',
-        --'htmx-lsp',
+        'htmx-lsp',
+        'templ',
+        'html-lsp',
+        'tsserver',
+        'angularls',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -573,6 +640,13 @@ require('lazy').setup({
     },
   },
 
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
+  },
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
@@ -797,11 +871,11 @@ require('lazy').setup({
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
   },
-  {
-    'my/todo.nvim',
-    dev = true,
-    opts = {},
-  },
+  -- {
+  --   'my/todo.nvim',
+  --   dev = true,
+  --   opts = {},
+  -- },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
@@ -813,7 +887,7 @@ require('lazy').setup({
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   -- require 'kickstart.plugins.debug',
-  require 'kickstart.plugins.indent_line',
+  --  require 'kickstart.plugins.indent_line',
   require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
