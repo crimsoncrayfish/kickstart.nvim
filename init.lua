@@ -579,7 +579,7 @@ require('lazy').setup({
         'zls',
         'codelldb',
         'angular-language-server',
-        'htmx-lsp',
+        --'htmx-lsp',
         'templ',
         'html-lsp',
         'tsserver',
