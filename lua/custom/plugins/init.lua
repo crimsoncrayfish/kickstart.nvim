@@ -30,7 +30,8 @@ return {
     'akinsho/toggleterm.nvim',
     version = '*',
     config = function()
-      require('toggleterm').setup {
+      local tt = require 'toggleterm'
+      tt.setup {
         insert_mapping = false,
         hide_numbers = true,
         start_in_insert = true,
