@@ -31,7 +31,6 @@ return {
     version = '*',
     config = function()
       require('toggleterm').setup {
-        open_mapping = [[<leader>tt]],
         insert_mapping = false,
         hide_numbers = true,
         start_in_insert = true,
@@ -45,6 +44,9 @@ return {
           end
         end,
       }
+      vim.keymap.set('n', '<leader>tt', function()
+        require('toggleterm').toggle()
+      end, { desc = '[T]oggle [T]erminal' })
     end,
   },
 }
